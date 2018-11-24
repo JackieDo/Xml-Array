@@ -1,0 +1,29 @@
+{
+    "name": "jackiedo/xml-array",
+    "description": "Simple tools to work with the conversion between xml and array",
+    "keywords": [
+        "xml",
+        "array",
+        "tools",
+        "convert",
+        "conversion"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jackie Do",
+            "email": "anhvudo@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "ext-dom": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jackiedo\\XmlArray\\": "src"
+        }
+    },
+    "minimum-stability": "stable"
+}
