@@ -45,7 +45,7 @@ array Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toArray
 
 > **Note:** The input XML can be one of types DOMDocument object, SimpleXMLElement object or well-formed XML string.
 
-###### Example:
+###### Example 1 (Convert from XML string):
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -134,6 +134,200 @@ $array = [
 ]
 ```
 
+###### Example 2 (Convert form XML object, as SimpleXMLElement):
+
+```php
+use Jackiedo\XmlArray\Xml2Array;
+...
+
+$xmlObject = simplexml_load_file('https://www.vietcombank.com.vn/ExchangeRates/ExrateXML.aspx');
+$array     = Xml2Array::convert($xmlObject)->toArray();
+```
+
+Result of piece of above code is:
+
+```php
+$array = [
+    "ExrateList" => [
+        "DateTime" => "11/26/2018 1:56:20 PM",
+        "Exrate" => [
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "AUD",
+                    "CurrencyName" => "AUST.DOLLAR",
+                    "Buy" => "16724.09",
+                    "Transfer" => "16825.04",
+                    "Sell" => "17008.7"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "CAD",
+                    "CurrencyName" => "CANADIAN DOLLAR",
+                    "Buy" => "17412.21",
+                    "Transfer" => "17570.34",
+                    "Sell" => "17762.14"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "CHF",
+                    "CurrencyName" => "SWISS FRANCE",
+                    "Buy" => "23074.67",
+                    "Transfer" => "23237.33",
+                    "Sell" => "23538.02"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "DKK",
+                    "CurrencyName" => "DANISH KRONE",
+                    "Buy" => "0",
+                    "Transfer" => "3493.19",
+                    "Sell" => "3602.67"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "EUR",
+                    "CurrencyName" => "EURO",
+                    "Buy" => "26264.39",
+                    "Transfer" => "26343.42",
+                    "Sell" => "26736.61"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "GBP",
+                    "CurrencyName" => "BRITISH POUND",
+                    "Buy" => "29562.43",
+                    "Transfer" => "29770.83",
+                    "Sell" => "30035.68"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "HKD",
+                    "CurrencyName" => "HONGKONG DOLLAR",
+                    "Buy" => "2939.91",
+                    "Transfer" => "2960.63",
+                    "Sell" => "3004.95"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "INR",
+                    "CurrencyName" => "INDIAN RUPEE",
+                    "Buy" => "0",
+                    "Transfer" => "331.15",
+                    "Sell" => "344.15"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "JPY",
+                    "CurrencyName" => "JAPANESE YEN",
+                    "Buy" => "200.38",
+                    "Transfer" => "202.4",
+                    "Sell" => "207.05"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "KRW",
+                    "CurrencyName" => "SOUTH KOREAN WON",
+                    "Buy" => "19.07",
+                    "Transfer" => "20.07",
+                    "Sell" => "21.33"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "KWD",
+                    "CurrencyName" => "KUWAITI DINAR",
+                    "Buy" => "0",
+                    "Transfer" => "76615.44",
+                    "Sell" => "79621.23"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "MYR",
+                    "CurrencyName" => "MALAYSIAN RINGGIT",
+                    "Buy" => "0",
+                    "Transfer" => "5532.17",
+                    "Sell" => "5603.76"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "NOK",
+                    "CurrencyName" => "NORWEGIAN KRONER",
+                    "Buy" => "0",
+                    "Transfer" => "2674.72",
+                    "Sell" => "2758.55"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "RUB",
+                    "CurrencyName" => "RUSSIAN RUBLE",
+                    "Buy" => "0",
+                    "Transfer" => "349.9",
+                    "Sell" => "389.89"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "SAR",
+                    "CurrencyName" => "SAUDI RIAL",
+                    "Buy" => "0",
+                    "Transfer" => "6206.27",
+                    "Sell" => "6449.75"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "SEK",
+                    "CurrencyName" => "SWEDISH KRONA",
+                    "Buy" => "0",
+                    "Transfer" => "2536.35",
+                    "Sell" => "2600.19"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "SGD",
+                    "CurrencyName" => "SINGAPORE DOLLAR",
+                    "Buy" => "16775.66",
+                    "Transfer" => "16893.92",
+                    "Sell" => "17078.33"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "THB",
+                    "CurrencyName" => "THAI BAHT",
+                    "Buy" => "691.64",
+                    "Transfer" => "691.64",
+                    "Sell" => "720.49"
+                ]
+            ],
+            [
+                "@attributes" => [
+                    "CurrencyCode" => "USD",
+                    "CurrencyName" => "US DOLLAR",
+                    "Buy" => "23295",
+                    "Transfer" => "23295",
+                    "Sell" => "23385"
+                ]
+            ]
+        ],
+        "Source" => "Joint Stock Commercial Bank for Foreign Trade of Vietnam - Vietcombank"
+    ]
+];
+```
+
 ### Convert XML to Json
 
 ###### Syntax:
@@ -142,7 +336,7 @@ $array = [
 string Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toJson([int $options = 0]);
 ```
 
-###### Example:
+###### Example 3:
 
 ```php
 $jsonString = Xml2Array::convert($xmlString)->toJson(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
@@ -156,13 +350,13 @@ $jsonString = Xml2Array::convert($xmlString)->toJson(JSON_UNESCAPED_UNICODE | JS
 string Array2Xml::convert(array $array)->toXml([bool $prettyOutput = false]);
 ```
 
-###### Example:
+###### Example 4:
 
 ```php
 use Jackiedo\XmlArray\Array2Xml;
 ...
 
-// We will use array from the result of above example as input for this example
+// We will use array from the result of first example as input for this example
 $xmlString = Array2Xml::convert($array)->toXml(true);
 ```
 
@@ -174,7 +368,7 @@ $xmlString = Array2Xml::convert($array)->toXml(true);
 DOMDocument Array2Xml::convert(array $array)->toDom();
 ```
 
-###### Example:
+###### Example 5:
 
 ```php
 $domObject = Array2Xml::convert($array)->toDom();
