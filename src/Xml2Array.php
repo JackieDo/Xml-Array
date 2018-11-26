@@ -131,13 +131,16 @@ class Xml2Array
         $this->loadXml($inputXml);
 
         // Convert the XML to an array, starting with the root node
-        $rootNode = $this->xml->documentElement->nodeName;
-        $this->array[$rootNode] = $this->parseNode($this->xml->documentElement);
+        $rootNode     = $this->xml->documentElement;
+        $rootValue    = $this->parseNode($rootNode);
+        $rootNodeName = $rootNode->nodeName;
+
+        $this->array[$rootNodeName] = $rootValue;
 
         // Add namespacing information to the root node
         if (!empty($this->namespaces) && $this->config['namespacesOnRoot']) {
-            if (!isset($this->array[$rootNode][$this->config['attributesKey']])) {
-                $this->array[$rootNode][$this->config['attributesKey']] = [];
+            if (!isset($this->array[$rootNodeName][$this->config['attributesKey']])) {
+                $this->array[$rootNodeName][$this->config['attributesKey']] = [];
             }
 
             foreach ($this->namespaces as $uri => $prefix) {
@@ -145,7 +148,7 @@ class Xml2Array
                     $prefix = self::ATTRIBUTE_NAMESPACE_SEPARATOR . $prefix;
                 }
 
-                $this->array[$rootNode][$this->config['attributesKey']][self::ATTRIBUTE_NAMESPACE . $prefix] = $uri;
+                $this->array[$rootNodeName][$this->config['attributesKey']][self::ATTRIBUTE_NAMESPACE . $prefix] = $uri;
             }
         }
 
@@ -186,6 +189,7 @@ class Xml2Array
     protected function loadXml($inputXml)
     {
         $this->xml = new DOMDocument($this->config['version'], $this->config['encoding']);
+        // $this->xml->preserveWhiteSpace = false;
 
         if (is_string($inputXml)) {
             $this->xml->loadXML($inputXml);
@@ -208,7 +212,7 @@ class Xml2Array
     protected function parseNode(DOMNode $node)
     {
         $output = [];
-        $output = $this->collectNamespaces($node, $output);
+        $output = $this->collectNodeNamespaces($node, $output);
 
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
@@ -316,10 +320,18 @@ class Xml2Array
         }
 
         $attributes = [];
+        $namespaces = [];
 
         foreach ($node->attributes as $attributeName => $attributeNode) {
             $attributeName              = $attributeNode->nodeName;
             $attributes[$attributeName] = (string) $attributeNode->value;
+
+            if ($attributeNode->namespaceURI) {
+                $nsUri    = $attributeNode->namespaceURI;
+                $nsPrefix = $attributeNode->lookupPrefix($nsUri);
+
+                $namespaces = $this->collectNamespaces($attributeNode);
+            }
         }
 
         // if its a leaf node, store the value in @value instead of directly it.
@@ -327,7 +339,26 @@ class Xml2Array
             $output = [$this->config['valueKey'] => $output];
         }
 
-        $output[$this->config['attributesKey']] = $attributes;
+        $output[$this->config['attributesKey']] = array_merge($attributes, $namespaces);
+
+        return $output;
+    }
+
+    /**
+     * Collect namespaces for special DOMNode
+     *
+     * @param  DOMNode $node
+     * @param  array   $output
+     *
+     * @return array
+     */
+    protected function collectNodeNamespaces(DOMNode $node, array $output)
+    {
+        $namespaces = $this->collectNamespaces($node);
+
+        if (!empty($namespaces)) {
+            $output[$this->config['attributesKey']] = $namespaces;
+        }
 
         return $output;
     }
@@ -336,12 +367,13 @@ class Xml2Array
      * Get the namespace of the supplied node, and add it to the list of known namespaces for this document
      *
      * @param  DOMNode $node
-     * @param  mixed   $output
      *
      * @return mixed
      */
-    protected function collectNamespaces(DOMNode $node, $output)
+    protected function collectNamespaces(DOMNode $node)
     {
+        $namespaces = [];
+
         if ($node->namespaceURI) {
             $nsUri    = $node->namespaceURI;
             $nsPrefix = $node->lookupPrefix($nsUri);
@@ -354,11 +386,11 @@ class Xml2Array
                         $nsPrefix = self::ATTRIBUTE_NAMESPACE_SEPARATOR . $nsPrefix;
                     }
 
-                    $output[$this->config['attributesKey']][self::ATTRIBUTE_NAMESPACE . $nsPrefix] = $nsUri;
+                    $namespaces[self::ATTRIBUTE_NAMESPACE . $nsPrefix] = $nsUri;
                 }
             }
         }
 
-        return $output;
+        return $namespaces;
     }
 }
