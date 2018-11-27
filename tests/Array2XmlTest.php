@@ -74,7 +74,8 @@ class Array2XmlTest extends TestCase
      */
     public function convert_array_to_xml_string()
     {
-        $dom = DOMDocument::loadXML($this->expected_xml_string);
+        $dom = new DOMDocument;
+        $dom->loadXML($this->expected_xml_string);
 
         $this->assertSame($dom->saveXML(), Array2Xml::convert($this->input_array)->toXml());
     }
@@ -88,7 +89,8 @@ class Array2XmlTest extends TestCase
      */
     public function convert_array_to_dom()
     {
-        $dom = DOMDocument::loadXML($this->expected_xml_string);
+        $dom = new DOMDocument;
+        $dom->loadXML($this->expected_xml_string);
 
         $this->assertSame($dom->saveXML(), Array2Xml::convert($this->input_array)->toDom()->saveXML());
     }
