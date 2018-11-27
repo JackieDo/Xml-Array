@@ -134,7 +134,7 @@ $array = [
 ]
 ```
 
-###### Example 2 (Convert form XML object, as SimpleXMLElement):
+###### Example 2 (Convert form XML object, such as SimpleXMLElement):
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -144,7 +144,7 @@ $xmlObject = simplexml_load_file('https://www.vietcombank.com.vn/ExchangeRates/E
 $array     = Xml2Array::convert($xmlObject)->toArray();
 ```
 
-Result of piece of above code is:
+The result of above code is:
 
 ```php
 $array = [

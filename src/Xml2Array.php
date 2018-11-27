@@ -189,7 +189,6 @@ class Xml2Array
     protected function loadXml($inputXml)
     {
         $this->xml = new DOMDocument($this->config['version'], $this->config['encoding']);
-        // $this->xml->preserveWhiteSpace = false;
 
         if (is_string($inputXml)) {
             $this->xml->loadXML($inputXml);
@@ -220,7 +219,12 @@ class Xml2Array
                 break;
 
             case XML_TEXT_NODE:
-                $output = trim($node->textContent);
+                $output = trim(preg_replace([
+                    '/\n+\s+/',
+                    '/\r+\s+/',
+                    '/\n+\t+/',
+                    '/\r+\t+/'
+                ], ' ', $node->textContent));
                 break;
 
             case XML_ELEMENT_NODE:
@@ -336,7 +340,11 @@ class Xml2Array
 
         // if its a leaf node, store the value in @value instead of directly it.
         if (!is_array($output)) {
-            $output = [$this->config['valueKey'] => $output];
+            if (!empty($output)) {
+                $output = [$this->config['valueKey'] => $output];
+            } else {
+                $output = [];
+            }
         }
 
         $output[$this->config['attributesKey']] = array_merge($attributes, $namespaces);

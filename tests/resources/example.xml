@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root_node>
+    <tag>Example tag</tag>
+
+    <attribute_tag description="This is a tag with attribute">Another tag with attributes</attribute_tag>
+
+    <cdata_section><![CDATA[ This is CDATA section ]]></cdata_section>
+
+    <tag_with_subtag>
+        <sub_tag>Sub tag 1</sub_tag>
+        <sub_tag>Sub tag 2</sub_tag>
+    </tag_with_subtag>
+
+    <mixed_section>
+        Hello
+        <![CDATA[ This is another CDATA section ]]>
+        <section id="sec_1">Section number 1</section>
+        <section id="sec_2">Section number 2</section>
+        <section id="sec_3">Section number 3</section>
+    </mixed_section>
+
+    <example:with_namespace xmlns:example="http://example.com">
+        <example:sub>Content</example:sub>
+    </example:with_namespace>
+</root_node>
