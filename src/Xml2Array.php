@@ -268,7 +268,7 @@ class Xml2Array
                             $output = $value;
                         }
                     }
-                } else {
+                } elseif ($child->nodeType !== XML_COMMENT_NODE) {
                     $nodeName = $child->nodeName;
 
                     if (!isset($output[$nodeName])) {
@@ -367,7 +367,9 @@ class Xml2Array
             }
         }
 
-        $output[$this->config['attributesKey']] = array_merge($attributes, $namespaces);
+        foreach (array_merge($attributes, $namespaces) as $key => $value) {
+            $output[$this->config['attributesKey']][$key] = $value;
+        }
 
         return $output;
     }
