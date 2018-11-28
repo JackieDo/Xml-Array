@@ -59,14 +59,63 @@ class Array2XmlTest extends TestCase
     ];
 
     /**
-     * Expected xml string
+     * Throw DOMException when there are more than one root node
      *
-     * @var string
+     * @test
+     *
+     * @return void
      */
-    protected $expected_xml_string = '<?xml version="1.0" encoding="UTF-8"?><root_node><tag>Example tag</tag><attribute_tag description="This is a tag with attribute">Another tag with attributes</attribute_tag><cdata_section><![CDATA[This is CDATA section]]></cdata_section><tag_with_subtag><sub_tag>Sub tag 1</sub_tag><sub_tag>Sub tag 2</sub_tag></tag_with_subtag><mixed_section>Hello<![CDATA[This is another CDATA section]]><section id="sec_1">Section number 1</section><section id="sec_2">Section number 2</section><section id="sec_3">Section number 3</section></mixed_section><example:with_namespace xmlns:example="http://example.com"><example:sub>Content</example:sub></example:with_namespace></root_node>';
+    public function throw_dom_exception_when_there_are_more_than_one_root_node()
+    {
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('XML documents are allowed only one root element. Wrap your elements in a key or set the `rootElement` parameter in the configuration.');
+
+        $process = Array2Xml::convert([
+            'root' => 'content',
+            'another_root' => 'Another content'
+        ]);
+    }
 
     /**
-     * Convert array to xml string
+     * Throw DOMException when node name is invalid
+     *
+     * @test
+     *
+     * @return void
+     */
+    public function throw_dom_exception_when_node_name_is_invalid()
+    {
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Invalid character in the tag name being generated: 0');
+
+        $process = Array2Xml::convert(['content']);
+    }
+
+    /**
+     * Throw DOMException when attribute name is invalid
+     *
+     * @test
+     *
+     * @return void
+     */
+    public function throw_dom_exception_when_attaribute_name_is_invalid()
+    {
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Invalid character in the attribute name being generated: invalid attribute');
+
+        $process = Array2Xml::convert([
+            'root' => [
+                'sub' => [
+                    '@attributes' => [
+                        'invalid attribute' => 'Attribute value'
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Convert array to XML string
      *
      * @test
      *
@@ -74,14 +123,11 @@ class Array2XmlTest extends TestCase
      */
     public function convert_array_to_xml_string()
     {
-        $dom = new DOMDocument;
-        $dom->loadXML($this->expected_xml_string);
-
-        $this->assertSame($dom->saveXML(), Array2Xml::convert($this->input_array)->toXml());
+        $this->assertXmlStringEqualsXmlFile(__DIR__ . '/resources/example.xml', Array2Xml::convert($this->input_array)->toXml());
     }
 
     /**
-     * Convert array to dom
+     * Convert array to DOM
      *
      * @test
      *
@@ -90,8 +136,8 @@ class Array2XmlTest extends TestCase
     public function convert_array_to_dom()
     {
         $dom = new DOMDocument;
-        $dom->loadXML($this->expected_xml_string);
+        $dom->loadXML(file_get_contents(__DIR__ . '/resources/example.xml'));
 
-        $this->assertSame($dom->saveXML(), Array2Xml::convert($this->input_array)->toDom()->saveXML());
+        $this->assertEquals($dom, Array2Xml::convert($this->input_array)->toDom());
     }
 }

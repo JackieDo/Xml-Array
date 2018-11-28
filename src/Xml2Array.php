@@ -191,7 +191,11 @@ class Xml2Array
         $this->xml = new DOMDocument($this->config['version'], $this->config['encoding']);
 
         if (is_string($inputXml)) {
-            $this->xml->loadXML($inputXml);
+            $parse = @$this->xml->loadXML($inputXml);
+
+            if ($parse === false) {
+                throw new DOMException('Error parsing XML string, input is not a well-formed XML string.');
+            }
         } elseif ($inputXml instanceof SimpleXMLElement) {
             $this->xml->loadXML($inputXml->asXML());
         } elseif ($inputXml instanceof DOMDocument) {
@@ -215,21 +219,16 @@ class Xml2Array
 
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
-                $output[$this->config['cdataKey']] = trim($node->textContent);
+                $output[$this->config['cdataKey']] = $this->normalizeTextContent($node->textContent);
                 break;
 
             case XML_TEXT_NODE:
-                $output = trim(preg_replace([
-                    '/\n+\s+/',
-                    '/\r+\s+/',
-                    '/\n+\t+/',
-                    '/\r+\t+/'
-                ], ' ', $node->textContent));
+                $output = $this->normalizeTextContent($node->textContent);
                 break;
 
             case XML_ELEMENT_NODE:
                 $output = $this->parseChildNodes($node, $output);
-                $output = $this->normalizeValues($output);
+                $output = $this->normalizeNodeValues($output);
                 $output = $this->collectAttributes($node, $output);
                 break;
         }
@@ -247,32 +246,36 @@ class Xml2Array
      */
     protected function parseChildNodes(DOMNode $node, $output)
     {
-        if ($node->childNodes->length == 1) {
-            if (!empty($output)) {
-                $output[$this->config['valueKey']] = $this->parseNode($node->firstChild);
-            } else {
-                $output = $this->parseNode($node->firstChild);
-            }
-        } else {
-            foreach ($node->childNodes as $child) {
-                if ($child->nodeType === XML_CDATA_SECTION_NODE) {
-                    $output[$this->config['cdataKey']] = trim($child->textContent);
-                } else {
-                    $value = $this->parseNode($child);
-
-                    if ($child->nodeType == XML_TEXT_NODE) {
-                        if ($value != '') {
-                            $output[$this->config['valueKey']] = $value;
-                        }
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_CDATA_SECTION_NODE) {
+                if (!is_array($output)) {
+                    if (!empty($output)) {
+                        $output = [$this->config['valueKey'] => $output];
                     } else {
-                        $nodeName = $child->nodeName;
-
-                        if (!isset($output[$nodeName])) {
-                            $output[$nodeName] = [];
-                        }
-
-                        $output[$nodeName][] = $value;
+                        $output = [];
                     }
+                }
+
+                $output[$this->config['cdataKey']] = $this->normalizeTextContent($child->textContent);
+            } else {
+                $value = $this->parseNode($child);
+
+                if ($child->nodeType == XML_TEXT_NODE) {
+                    if ($value != '') {
+                        if (!empty($output)) {
+                            $output[$this->config['valueKey']] = $value;
+                        } else {
+                            $output = $value;
+                        }
+                    }
+                } else {
+                    $nodeName = $child->nodeName;
+
+                    if (!isset($output[$nodeName])) {
+                        $output[$nodeName] = [];
+                    }
+
+                    $output[$nodeName][] = $value;
                 }
             }
         }
@@ -281,32 +284,49 @@ class Xml2Array
     }
 
     /**
-     * Normalize values
+     * Clean text content of text node
      *
-     * @param  mixed $output
+     * @param  string $textContent
+     *
+     * @return string
+     */
+    protected function normalizeTextContent($textContent)
+    {
+        return trim(preg_replace([
+            '/\n+\s+/',
+            '/\r+\s+/',
+            '/\n+\t+/',
+            '/\r+\t+/'
+        ], ' ', $textContent));
+    }
+
+    /**
+     * Normalize values of node
+     *
+     * @param  mixed $values
      *
      * @return mixed
      */
-    protected function normalizeValues($output)
+    protected function normalizeNodeValues($values)
     {
-        if (is_array($output)) {
+        if (is_array($values)) {
             // if only one node of its kind, assign it directly instead if array($value);
-            foreach ($output as $key => $value) {
+            foreach ($values as $key => $value) {
                 if (is_array($value) && count($value) === 1) {
                     $keyName = array_keys($value)[0];
 
                     if (is_numeric($keyName)) {
-                        $output[$key] = $value[$keyName];
+                        $values[$key] = $value[$keyName];
                     }
                 }
             }
 
-            if (empty($output)) {
-                $output = '';
+            if (empty($values)) {
+                $values = '';
             }
         }
 
-        return $output;
+        return $values;
     }
 
     /**

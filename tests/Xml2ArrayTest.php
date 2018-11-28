@@ -59,7 +59,7 @@ class Xml2ArrayTest extends TestCase
     ];
 
     /**
-     * Convert to array from an xml string containing only one empty node
+     * Convert to array from an XML string containing only one empty node
      *
      * @test
      *
@@ -69,13 +69,13 @@ class Xml2ArrayTest extends TestCase
     {
         $string = '<root />';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => ''
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from an xml string containing one node with empty value
+     * Convert to array from an XML string containing one node with empty value
      *
      * @test
      *
@@ -85,13 +85,13 @@ class Xml2ArrayTest extends TestCase
     {
         $string = '<root></root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => ''
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from xml string containing one node that whose value is on one line
+     * Convert to array from XML string containing one node that whose value is on one line
      *
      * @test
      *
@@ -101,13 +101,13 @@ class Xml2ArrayTest extends TestCase
     {
         $string = '<root>Welcome to Xml2Array Converter</root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => 'Welcome to Xml2Array Converter'
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from xml string containing one node that whose value is on multilines
+     * Convert to array from XML string containing one node that whose value is on multilines
      *
      * @test
      *
@@ -122,13 +122,13 @@ class Xml2ArrayTest extends TestCase
             Xml2Array Converter
         </root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => "Welcome to Xml2Array Converter"
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from xml string containing one node that whose value is cdata section
+     * Convert to array from XML string containing one node that whose value is Cdata Section
      *
      * @test
      *
@@ -138,7 +138,7 @@ class Xml2ArrayTest extends TestCase
     {
         $string = '<root><![CDATA[ This is CDATA section ]]></root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => [
                 '@cdata' => 'This is CDATA section'
             ]
@@ -146,7 +146,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert to array from xml string that root node has sub node
+     * Convert to array from XML string that root node has sub node
      *
      * @test
      *
@@ -159,7 +159,7 @@ class Xml2ArrayTest extends TestCase
             <subnode_2>Node value</subnode_2>
         </root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => [
                 'subnode_1' => 'Node value',
                 'subnode_2' => 'Node value'
@@ -168,7 +168,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert to array from xml string that node only has attributes
+     * Convert to array from XML string that node only has attributes
      *
      * @test
      *
@@ -181,7 +181,7 @@ class Xml2ArrayTest extends TestCase
             <subnode_2 description="Subnode #2"></subnode_2>
         </root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => [
                 'subnode_1' => [
                     '@attributes' => [
@@ -198,7 +198,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert to array from xml string that node has value and attributes
+     * Convert to array from XML string that node has value and attributes
      *
      * @test
      *
@@ -211,7 +211,7 @@ class Xml2ArrayTest extends TestCase
             <subnode_2 description="Subnode #2">Node value</subnode_2>
         </root>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root' => [
                 'subnode_1' => [
                     '@value' => 'Node value',
@@ -230,7 +230,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert to array from xml string containing has namespaces
+     * Convert to array from XML string containing has namespaces
      *
      * @test
      *
@@ -245,7 +245,7 @@ class Xml2ArrayTest extends TestCase
             </example:node_with_namespace>
         </root_node>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root_node' => [
                 'example:node_with_namespace' => [
                     'example:sub' => [
@@ -263,7 +263,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert to array from xml string with special config
+     * Convert to array from XML string with special config
      *
      * @test
      *
@@ -276,7 +276,7 @@ class Xml2ArrayTest extends TestCase
             <sub_node description="An attribute">Content</sub_node>
         </root_node>';
 
-        $this->assertSame([
+        $this->assertEquals([
             'root_node' => [
                 'sub_node' => [
                     '#text' => 'Content',
@@ -292,7 +292,7 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert from xml string to array with all cases
+     * Convert from XML string to array with all cases
      *
      * @test
      */
@@ -304,11 +304,11 @@ class Xml2ArrayTest extends TestCase
             'namespacesOnRoot' => false
         ])->toArray();
 
-        $this->assertSame($this->fulltest_expected_result, $result);
+        $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Convert from xml object to array with all cases
+     * Convert from XML object to array with all cases
      *
      * @test
      */
@@ -320,11 +320,11 @@ class Xml2ArrayTest extends TestCase
             'namespacesOnRoot' => false
         ])->toArray();
 
-        $this->assertSame($this->fulltest_expected_result, $result);
+        $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Convert from dom object to array with all cases
+     * Convert from DOM object to array with all cases
      *
      * @test
      */
@@ -337,11 +337,26 @@ class Xml2ArrayTest extends TestCase
             'namespacesOnRoot' => false
         ])->toArray();
 
-        $this->assertSame($this->fulltest_expected_result, $result);
+        $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Throw dom exception when invalid input
+     * Throw DOMException when input XML string is not well-formed XML
+     *
+     * @test
+     *
+     * @return void
+     */
+    public function throw_dom_exception_when_input_xml_string_not_well_formed()
+    {
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Error parsing XML string, input is not a well-formed XML string.');
+
+        Xml2Array::convert('123');
+    }
+
+    /**
+     * Throw DOMException when invalid input
      *
      * @test
      *
@@ -350,23 +365,21 @@ class Xml2ArrayTest extends TestCase
     public function throw_dom_exception_when_invalid_input()
     {
         $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('The input XML must be one of types DOMDocument, SimpleXMLElement or well-formed XML string.');
 
         Xml2Array::convert([]);
     }
 
     /**
-     * Convert from xml string to json
+     * Convert from XML string to Json
      *
      * @test
      */
     public function convert_from_xml_string_to_json()
     {
         $string = file_get_contents(__DIR__ . '/resources/example.xml');
-
         $result = Xml2Array::convert($string)->toJson();
 
-        $expected = '{"root_node":{"tag":"Example tag","attribute_tag":{"@value":"Another tag with attributes","@attributes":{"description":"This is a tag with attribute"}},"cdata_section":{"@cdata":"This is CDATA section"},"tag_with_subtag":{"sub_tag":["Sub tag 1","Sub tag 2"]},"mixed_section":{"@value":"Hello","@cdata":"This is another CDATA section","section":[{"@value":"Section number 1","@attributes":{"id":"sec_1"}},{"@value":"Section number 2","@attributes":{"id":"sec_2"}},{"@value":"Section number 3","@attributes":{"id":"sec_3"}}]},"example:with_namespace":{"example:sub":"Content"},"@attributes":{"xmlns:example":"http:\/\/example.com"}}}';
-
-        $this->assertSame($expected, $result);
+        $this->assertJsonStringEqualsJsonFile(__DIR__ . '/resources/example.json', $result);
     }
 }

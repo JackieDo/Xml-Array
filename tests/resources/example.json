@@ -1,0 +1,57 @@
+{
+    "root_node":
+    {
+        "tag": "Example tag",
+        "attribute_tag":
+        {
+            "@value": "Another tag with attributes",
+            "@attributes":
+            {
+                "description": "This is a tag with attribute"
+            }
+        },
+        "cdata_section":
+        {
+            "@cdata": "This is CDATA section"
+        },
+        "tag_with_subtag":
+        {
+            "sub_tag": ["Sub tag 1", "Sub tag 2"]
+        },
+        "mixed_section":
+        {
+            "@value": "Hello",
+            "@cdata": "This is another CDATA section",
+            "section": [
+            {
+                "@value": "Section number 1",
+                "@attributes":
+                {
+                    "id": "sec_1"
+                }
+            },
+            {
+                "@value": "Section number 2",
+                "@attributes":
+                {
+                    "id": "sec_2"
+                }
+            },
+            {
+                "@value": "Section number 3",
+                "@attributes":
+                {
+                    "id": "sec_3"
+                }
+            }]
+        },
+        "example:with_namespace":
+        {
+            "example:sub": "Content"
+        },
+        "@attributes":
+        {
+            "xmlns:example": "http:\/\/example.com"
+        }
+    }
+}
