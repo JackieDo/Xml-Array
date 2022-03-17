@@ -18,12 +18,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: ext-dom
           coverage: none
 
       - name: Install dependencies
         run: |
-          composer self-update
           composer require "phpunit/phpunit" --no-interaction --no-update
           composer update --prefer-source --no-interaction
       - name: Execute tests
