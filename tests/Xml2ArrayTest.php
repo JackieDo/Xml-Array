@@ -3,115 +3,115 @@
 use Jackiedo\XmlArray\Xml2Array;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class Xml2ArrayTest extends TestCase
 {
     /**
-     * Store expected result for full test
+     * Store expected result for full test.
      *
      * @var string
      */
     protected $fulltest_expected_result = [
-        "root_node" => [
-            "tag" => "Example tag",
-            "attribute_tag" => [
-                "@value" => "Another tag with attributes",
-                "@attributes" => [
-                    "description" => "This is a tag with attribute"
-                ]
-            ],
-            "cdata_section" => [
-                "@cdata" => "This is CDATA section"
-            ],
-            "tag_with_subtag" => [
-                "sub_tag" => ["Sub tag 1", "Sub tag 2"]
-            ],
-            "mixed_section" => [
-                "@value" => "Hello",
-                "@cdata" => "This is another CDATA section",
-                "section" => [
-                    [
-                        "@value" => "Section number 1",
-                        "@attributes" => [
-                            "id" => "sec_1"
-                        ]
-                    ],
-                    [
-                        "@value" => "Section number 2",
-                        "@attributes" => [
-                            "id" => "sec_2"
-                        ]
-                    ],
-                    [
-                        "@value" => "Section number 3",
-                        "@attributes" => [
-                            "id" => "sec_3"
-                        ]
-                    ]
-                ]
-            ],
-            "example:with_namespace" => [
-                "@attributes" => [
-                    "xmlns:example" => "http://example.com"
+        'root_node' => [
+            'tag'           => 'Example tag',
+            'attribute_tag' => [
+                '@value'      => 'Another tag with attributes',
+                '@attributes' => [
+                    'description' => 'This is a tag with attribute',
                 ],
-                "example:sub" => "Content"
             ],
-        ]
+            'cdata_section' => [
+                '@cdata' => 'This is CDATA section',
+            ],
+            'tag_with_subtag' => [
+                'sub_tag' => ['Sub tag 1', 'Sub tag 2'],
+            ],
+            'mixed_section' => [
+                '@value'  => 'Hello',
+                '@cdata'  => 'This is another CDATA section',
+                'section' => [
+                    [
+                        '@value'      => 'Section number 1',
+                        '@attributes' => [
+                            'id' => 'sec_1',
+                        ],
+                    ],
+                    [
+                        '@value'      => 'Section number 2',
+                        '@attributes' => [
+                            'id' => 'sec_2',
+                        ],
+                    ],
+                    [
+                        '@value'      => 'Section number 3',
+                        '@attributes' => [
+                            'id' => 'sec_3',
+                        ],
+                    ],
+                ],
+            ],
+            'example:with_namespace' => [
+                '@attributes' => [
+                    'xmlns:example' => 'http://example.com',
+                ],
+                'example:sub' => 'Content',
+            ],
+        ],
     ];
 
     /**
-     * Convert to array from an XML string containing only one empty node
+     * Convert to array from an XML string containing only one empty node.
      *
+     * @testdox Convert to array from an XML string containing only one empty node.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_an_xml_string_containing_only_one_empty_node()
     {
         $string = '<root />';
 
         $this->assertEquals([
-            'root' => ''
+            'root' => '',
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from an XML string containing one node with empty value
+     * Convert to array from an XML string containing one node with empty value.
      *
+     * @testdox Convert to array from an XML string containing one node with empty value.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_an_xml_string_containing_one_node_with_empty_value()
     {
         $string = '<root></root>';
 
         $this->assertEquals([
-            'root' => ''
+            'root' => '',
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string containing one node that whose value is on one line
+     * Convert to array from XML string containing one node that whose value is on one line.
      *
+     * @testdox Convert to array from XML string containing one node that whose value is on one line.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_containing_one_node_that_whose_value_is_on_one_line()
     {
         $string = '<root>Welcome to Xml2Array Converter</root>';
 
         $this->assertEquals([
-            'root' => 'Welcome to Xml2Array Converter'
+            'root' => 'Welcome to Xml2Array Converter',
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string containing one node that whose value is on multilines
+     * Convert to array from XML string containing one node that whose value is on multilines.
      *
+     * @testdox Convert to array from XML string containing one node that whose value is on multilines.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_containing_one_node_that_whose_value_is_on_multilines()
     {
@@ -123,16 +123,15 @@ class Xml2ArrayTest extends TestCase
         </root>';
 
         $this->assertEquals([
-            'root' => "Welcome to Xml2Array Converter"
+            'root' => 'Welcome to Xml2Array Converter',
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string containing one node that whose value is Cdata Section
+     * Convert to array from XML string containing one node that whose value is Cdata Section.
      *
+     * @testdox Convert to array from XML string containing one node that whose value is Cdata Section.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_containing_one_node_that_whose_value_is_cdata_section()
     {
@@ -140,17 +139,16 @@ class Xml2ArrayTest extends TestCase
 
         $this->assertEquals([
             'root' => [
-                '@cdata' => 'This is CDATA section'
-            ]
+                '@cdata' => 'This is CDATA section',
+            ],
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string that root node has sub node
+     * Convert to array from XML string that root node has sub node.
      *
+     * @testdox Convert to array from XML string that root node has sub node.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_that_root_node_has_sub_node()
     {
@@ -162,17 +160,16 @@ class Xml2ArrayTest extends TestCase
         $this->assertEquals([
             'root' => [
                 'subnode_1' => 'Node value',
-                'subnode_2' => 'Node value'
-            ]
+                'subnode_2' => 'Node value',
+            ],
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string that node only has attributes
+     * Convert to array from XML string that node only has attributes.
      *
+     * @testdox Convert to array from XML string that node only has attributes.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_that_node_only_has_attributes()
     {
@@ -185,24 +182,23 @@ class Xml2ArrayTest extends TestCase
             'root' => [
                 'subnode_1' => [
                     '@attributes' => [
-                        'description' => 'Subnode #1'
-                    ]
+                        'description' => 'Subnode #1',
+                    ],
                 ],
                 'subnode_2' => [
                     '@attributes' => [
-                        'description' => 'Subnode #2'
-                    ]
-                ]
-            ]
+                        'description' => 'Subnode #2',
+                    ],
+                ],
+            ],
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string that node has value and attributes
+     * Convert to array from XML string that node has value and attributes.
      *
+     * @testdox Convert to array from XML string that node has value and attributes.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_that_node_has_value_and_attributes()
     {
@@ -214,27 +210,26 @@ class Xml2ArrayTest extends TestCase
         $this->assertEquals([
             'root' => [
                 'subnode_1' => [
-                    '@value' => 'Node value',
+                    '@value'      => 'Node value',
                     '@attributes' => [
-                        'description' => 'Subnode #1'
-                    ]
+                        'description' => 'Subnode #1',
+                    ],
                 ],
                 'subnode_2' => [
-                    '@value' => 'Node value',
+                    '@value'      => 'Node value',
                     '@attributes' => [
-                        'description' => 'Subnode #2'
-                    ]
-                ]
-            ]
+                        'description' => 'Subnode #2',
+                    ],
+                ],
+            ],
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string containing has namespaces
+     * Convert to array from XML string containing has namespaces.
      *
+     * @testdox Convert to array from XML string containing has namespaces.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_containing_has_namespaces()
     {
@@ -249,25 +244,24 @@ class Xml2ArrayTest extends TestCase
             'root_node' => [
                 'example:node_with_namespace' => [
                     'example:sub' => [
-                        '@value' => 'Content',
+                        '@value'      => 'Content',
                         '@attributes' => [
-                            'example:description' => 'An attribute with namespace'
-                        ]
-                    ]
+                            'example:description' => 'An attribute with namespace',
+                        ],
+                    ],
                 ],
                 '@attributes' => [
-                    'xmlns:example' => 'http://example.com'
-                ]
-            ]
+                    'xmlns:example' => 'http://example.com',
+                ],
+            ],
         ], Xml2Array::convert($string)->toArray());
     }
 
     /**
-     * Convert to array from XML string with special config
+     * Convert to array from XML string with special config.
      *
+     * @testdox Convert to array from XML string with special config.
      * @test
-     *
-     * @return void
      */
     public function convert_to_array_from_xml_string_with_special_config()
     {
@@ -279,21 +273,22 @@ class Xml2ArrayTest extends TestCase
         $this->assertEquals([
             'root_node' => [
                 'sub_node' => [
-                    '#text' => 'Content',
+                    '#text'       => 'Content',
                     '#attributes' => [
-                        'description' => 'An attribute'
-                    ]
-                ]
-            ]
+                        'description' => 'An attribute',
+                    ],
+                ],
+            ],
         ], Xml2Array::convert($string, [
-            'valueKey' => '#text',
-            'attributesKey' => '#attributes'
+            'valueKey'      => '#text',
+            'attributesKey' => '#attributes',
         ])->toArray());
     }
 
     /**
-     * Convert from XML string to array with all cases
+     * Convert from XML string to array with all cases.
      *
+     * @testdox Convert from XML string to array with all cases.
      * @test
      */
     public function convert_from_xml_string_to_array_with_all_cases()
@@ -301,15 +296,16 @@ class Xml2ArrayTest extends TestCase
         $string = file_get_contents(__DIR__ . '/resources/example.xml');
 
         $result = Xml2Array::convert($string, [
-            'namespacesOnRoot' => false
+            'namespacesOnRoot' => false,
         ])->toArray();
 
         $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Convert from XML object to array with all cases
+     * Convert from XML object to array with all cases.
      *
+     * @testdox Convert from XML object to array with all cases.
      * @test
      */
     public function convert_from_xml_object_to_array()
@@ -317,15 +313,16 @@ class Xml2ArrayTest extends TestCase
         $xmlObject = simplexml_load_file(__DIR__ . '/resources/example.xml');
 
         $result = Xml2Array::convert($xmlObject, [
-            'namespacesOnRoot' => false
+            'namespacesOnRoot' => false,
         ])->toArray();
 
         $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Convert from DOM object to array with all cases
+     * Convert from DOM object to array with all cases.
      *
+     * @testdox Convert from DOM object to array with all cases.
      * @test
      */
     public function convert_from_dom_object_to_array()
@@ -334,18 +331,17 @@ class Xml2ArrayTest extends TestCase
         $domObject->load(__DIR__ . '/resources/example.xml');
 
         $result = Xml2Array::convert($domObject, [
-            'namespacesOnRoot' => false
+            'namespacesOnRoot' => false,
         ])->toArray();
 
         $this->assertEquals($this->fulltest_expected_result, $result);
     }
 
     /**
-     * Throw DOMException when input XML string is not well-formed XML
+     * Throw DOMException when input XML string is not well-formed XML.
      *
+     * @testdox Throw DOMException when input XML string is not well-formed XML.
      * @test
-     *
-     * @return void
      */
     public function throw_dom_exception_when_input_xml_string_not_well_formed()
     {
@@ -356,11 +352,10 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Throw DOMException when invalid input
+     * Throw DOMException when invalid input.
      *
+     * @testdox Throw DOMException when invalid input.
      * @test
-     *
-     * @return void
      */
     public function throw_dom_exception_when_invalid_input()
     {
@@ -371,8 +366,9 @@ class Xml2ArrayTest extends TestCase
     }
 
     /**
-     * Convert from XML string to Json
+     * Convert from XML string to Json.
      *
+     * @testdox Convert from XML string to Json.
      * @test
      */
     public function convert_from_xml_string_to_json()

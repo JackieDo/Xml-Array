@@ -2,7 +2,6 @@
 [![Build Status](https://api.travis-ci.org/JackieDo/Xml-Array.svg?branch=master)](https://travis-ci.org/JackieDo/Xml-Array)
 [![Total Downloads](https://poser.pugx.org/jackiedo/xml-array/downloads)](https://packagist.org/packages/jackiedo/xml-array)
 [![Latest Stable Version](https://poser.pugx.org/jackiedo/xml-array/v/stable)](https://packagist.org/packages/jackiedo/xml-array)
-[![Latest Unstable Version](https://poser.pugx.org/jackiedo/xml-array/v/unstable)](https://packagist.org/packages/jackiedo/xml-array)
 [![License](https://poser.pugx.org/jackiedo/xml-array/license)](https://packagist.org/packages/jackiedo/xml-array)
 
 The conversion between xml and array becomes easier than ever. This package provides some very simple classes to convert XML to array and back.
@@ -15,30 +14,38 @@ The conversion between xml and array becomes easier than ever. This package prov
 # Overview
 Look at one of the following sessions to learn more about this package.
 
-* [Installation](#installation)
-* [Basic usage](#basic-usage)
+- [Xml-Array](#xml-array)
+- [Features of this package](#features-of-this-package)
+- [Overview](#overview)
+  - [Installation](#installation)
+  - [Basic usage](#basic-usage)
     - [Convert XML to array](#convert-xml-to-array)
     - [Convert XML to Json](#convert-xml-to-json)
     - [Convert array to XML](#convert-array-to-xml)
     - [Convert array to DOM](#convert-array-to-dom)
-* [Advanced usage](#advanced-usage)
+  - [Advanced usage](#advanced-usage)
     - [Set configuration](#set-configuration)
+      - [Method 1](#method-1)
+      - [Method 2](#method-2)
+      - [Method 3](#method-3)
     - [Get configuration](#get-configuration)
     - [Default configuration](#default-configuration)
-* [License](#license)
+      - [For Xml2Array](#for-xml2array)
+      - [For Array2Xml](#for-array2xml)
+- [License](#license)
 
 ## Installation
 You can install this package through [Composer](https://getcomposer.org).
 
 ```shell
-composer require jackiedo/xml-array
+$ composer require jackiedo/xml-array
 ```
 
 ## Basic usage
 
 ### Convert XML to array
 
-###### Syntax:
+**Syntax**:
 
 ```
 array Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toArray();
@@ -46,7 +53,7 @@ array Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toArray
 
 > **Note:** The input XML can be one of types DOMDocument object, SimpleXMLElement object or well-formed XML string.
 
-###### Example 1 (Convert from XML string):
+**Example 1** - _(Convert from XML string)_:
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -135,7 +142,7 @@ $array = [
 ]
 ```
 
-###### Example 2 (Convert form XML object, such as SimpleXMLElement):
+**Example 2** - _(Convert form XML object, such as SimpleXMLElement)_:
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -331,13 +338,13 @@ $array = [
 
 ### Convert XML to Json
 
-###### Syntax:
+**Syntax**:
 
 ```
 string Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toJson([int $options = 0]);
 ```
 
-###### Example 3:
+**Example 3**:
 
 ```php
 $jsonString = Xml2Array::convert($xmlString)->toJson(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
@@ -345,13 +352,13 @@ $jsonString = Xml2Array::convert($xmlString)->toJson(JSON_UNESCAPED_UNICODE | JS
 
 ### Convert array to XML
 
-###### Syntax:
+**Syntax**:
 
 ```
 string Array2Xml::convert(array $array)->toXml([bool $prettyOutput = false]);
 ```
 
-###### Example 4:
+**Example 4**:
 
 ```php
 use Jackiedo\XmlArray\Array2Xml;
@@ -363,13 +370,13 @@ $xmlString = Array2Xml::convert($array)->toXml(true);
 
 ### Convert array to DOM
 
-###### Syntax:
+**Syntax**:
 
 ```
 DOMDocument Array2Xml::convert(array $array)->toDom();
 ```
 
-###### Example 5:
+**Example 5**:
 
 ```php
 $domObject = Array2Xml::convert($array)->toDom();
@@ -380,7 +387,7 @@ $domObject = Array2Xml::convert($array)->toDom();
 ### Set configuration
 You can set configuration for conversion process with one of following methods:
 
-###### Method 1:
+#### Method 1
 
 ```php
 ...
@@ -398,14 +405,14 @@ $xml = Array2Xml::convert($inputArray, $config)->toXml();
 
 > **Note**: Configuration is an array of parameters. For more details, see section [Default configuration](#default-configuration).
 
-###### Method 2:
+#### Method 2
 
 ```php
 $converter = new Xml2Array($config);
 $array     = $converter->convertFrom($inputXml)->toArray();
 ```
 
-###### Method 3:
+#### Method 3
 
 ```php
 $converter = new Xml2Array;
@@ -421,7 +428,7 @@ $config = $converter->getConfig();
 
 ### Default configuration
 
-###### For Xml2Array
+#### For Xml2Array
 
 ```php
 $defaultConfig = [
@@ -434,7 +441,7 @@ $defaultConfig = [
 ];
 ```
 
-###### For Array2Xml
+#### For Array2Xml
 
 ```php
 $defaultConfig = [
@@ -447,5 +454,5 @@ $defaultConfig = [
 ];
 ```
 
-## License
+# License
 [MIT](LICENSE) © Jackie Do

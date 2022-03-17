@@ -1,4 +1,6 @@
-<?php namespace Jackiedo\XmlArray;
+<?php
+
+namespace Jackiedo\XmlArray;
 
 use DOMDocument;
 use DOMException;
@@ -6,62 +8,56 @@ use DOMNode;
 use SimpleXMLElement;
 
 /**
- * Xml2Array: A class to convert XML to an array in PHP
+ * A class to convert XML to an array in PHP.
  * Takes a DOMDocument object or SimpleXMLElement object or an XML string as input.
  *
- * Usage:
- *       $array = Xml2Array::convert($xml)->toArray();
- *       $array = Xml2Array::convert($xml, ['useNamespaces' => true])->toArray();
- *       $json  = Xml2Array::convert($xml)->toJson();
+ * @see https://github.com/JackieDo/Xml-Array/blob/master/README.md Documentation.
  *
- * @package xml-array
  * @author Jackie Do <anhvudo@gmail.com>
- * @copyright 2018
- * @version $Id$
- * @access public
+ * @license MIT
  */
 class Xml2Array
 {
     /**
-     * The name of the XML attribute that indicates a namespace definition
+     * The name of the XML attribute that indicates a namespace definition.
      */
-    const ATTRIBUTE_NAMESPACE = 'xmlns';
+    public const ATTRIBUTE_NAMESPACE = 'xmlns';
 
     /**
-     * The string that separates the namespace attribute from the prefix for the namespace
+     * The string that separates the namespace attribute from the prefix for the namespace.
      */
-    const ATTRIBUTE_NAMESPACE_SEPARATOR = ':';
+    public const ATTRIBUTE_NAMESPACE_SEPARATOR = ':';
 
     /**
-     * The configuration of the current instance
+     * The configuration of the current instance.
      *
      * @var array
      */
     protected $config = [];
 
     /**
-     * The working XML document
+     * The working XML document.
      *
      * @var DOMDocument
      */
-    protected $xml = null;
+    protected $xml;
 
     /**
-     * The working list of XML namespaces
+     * The working list of XML namespaces.
      *
      * @var array
      */
     protected $namespaces = [];
 
     /**
-     * The result of this conversion
+     * The result of this conversion.
      *
      * @var array
      */
     protected $array = [];
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param array $config The configuration to use for this instance
      */
@@ -71,9 +67,9 @@ class Xml2Array
     }
 
     /**
-     * Set configuration for converter
+     * Set configuration for converter.
      *
-     * @param  array  $config The configuration to use for conversion
+     * @param array $config The configuration to use for conversion
      *
      * @return $this
      */
@@ -85,7 +81,7 @@ class Xml2Array
             'attributesKey'    => '@attributes',
             'cdataKey'         => '@cdata',
             'valueKey'         => '@value',
-            'namespacesOnRoot' => true
+            'namespacesOnRoot' => true,
         ];
 
         $this->config = array_merge($defaultConfig, $config);
@@ -94,7 +90,7 @@ class Xml2Array
     }
 
     /**
-     * Return configuration of converter
+     * Return configuration of converter.
      *
      * @return array
      */
@@ -105,12 +101,12 @@ class Xml2Array
 
     /**
      * Convert an XML DOMDocument or XML string to an array
-     * A static facade for ease of use and backwards compatibility
+     * A static facade for ease of use and backwards compatibility.
      *
-     * @param  DOMDocument|SimpleXMLElement|string $xml      The XML to convert to an array
-     * @param  array                               $config   The configuration to use for the conversion
+     * @param DOMDocument|SimpleXMLElement|string $xml    The XML to convert to an array
+     * @param array                               $config The configuration to use for the conversion
      *
-     * @return array  An array representation of the input XML
+     * @return array An array representation of the input XML
      */
     public static function convert($xml, array $config = [])
     {
@@ -120,11 +116,11 @@ class Xml2Array
     }
 
     /**
-     * Convert input XML to an array
+     * Convert input XML to an array.
      *
-     * @param  DOMDocument|SimpleXMLElement|string $inputXml The XML to convert to an array
+     * @param DOMDocument|SimpleXMLElement|string $inputXml The XML to convert to an array
      *
-     * @return array  An array representation of the input XML
+     * @return array An array representation of the input XML
      */
     public function convertFrom($inputXml)
     {
@@ -156,7 +152,7 @@ class Xml2Array
     }
 
     /**
-     * Export result as array
+     * Export result as array.
      *
      * @return array
      */
@@ -166,21 +162,21 @@ class Xml2Array
     }
 
     /**
-     * Get result as json string
+     * Get result as json string.
      *
-     * @param  integer $options
+     * @param int $flags
      *
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson($flags = 0)
     {
-        return json_encode($this->array, $options);
+        return json_encode($this->array, $flags);
     }
 
     /**
-     * Load input into DOMDocument
+     * Load input into DOMDocument.
      *
-     * @param  DOMDocument|SimpleXMLElement|string $inputXml The XML to convert to an array
+     * @param DOMDocument|SimpleXMLElement|string $inputXml The XML to convert to an array
      *
      * @throws DOMException
      *
@@ -193,7 +189,7 @@ class Xml2Array
         if (is_string($inputXml)) {
             $parse = @$this->xml->loadXML($inputXml);
 
-            if ($parse === false) {
+            if (false === $parse) {
                 throw new DOMException('Error parsing XML string, input is not a well-formed XML string.');
             }
         } elseif ($inputXml instanceof SimpleXMLElement) {
@@ -206,9 +202,9 @@ class Xml2Array
     }
 
     /**
-     * Parse an XML DOMNode
+     * Parse an XML DOMNode.
      *
-     * @param  DOMNode $node A single XML DOMNode
+     * @param DOMNode $node A single XML DOMNode
      *
      * @return mixed
      */
@@ -237,17 +233,17 @@ class Xml2Array
     }
 
     /**
-     * Parse child nodes of DOMNode
+     * Parse child nodes of DOMNode.
      *
-     * @param  DOMNode $node
-     * @param  mixed   $output
+     * @param DOMNode $node
+     * @param mixed   $output
      *
      * @return mxied
      */
     protected function parseChildNodes(DOMNode $node, $output)
     {
         foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_CDATA_SECTION_NODE) {
+            if (XML_CDATA_SECTION_NODE === $child->nodeType) {
                 if (!is_array($output)) {
                     if (!empty($output)) {
                         $output = [$this->config['valueKey'] => $output];
@@ -260,15 +256,15 @@ class Xml2Array
             } else {
                 $value = $this->parseNode($child);
 
-                if ($child->nodeType == XML_TEXT_NODE) {
-                    if ($value != '') {
+                if (XML_TEXT_NODE == $child->nodeType) {
+                    if ('' != $value) {
                         if (!empty($output)) {
                             $output[$this->config['valueKey']] = $value;
                         } else {
                             $output = $value;
                         }
                     }
-                } elseif ($child->nodeType !== XML_COMMENT_NODE) {
+                } elseif (XML_COMMENT_NODE !== $child->nodeType) {
                     $nodeName = $child->nodeName;
 
                     if (!isset($output[$nodeName])) {
@@ -284,9 +280,9 @@ class Xml2Array
     }
 
     /**
-     * Clean text content of text node
+     * Clean text content of text node.
      *
-     * @param  string $textContent
+     * @param string $textContent
      *
      * @return string
      */
@@ -296,14 +292,14 @@ class Xml2Array
             '/\n+\s+/',
             '/\r+\s+/',
             '/\n+\t+/',
-            '/\r+\t+/'
+            '/\r+\t+/',
         ], ' ', $textContent));
     }
 
     /**
-     * Normalize values of node
+     * Normalize values of node.
      *
-     * @param  mixed $values
+     * @param mixed $values
      *
      * @return mixed
      */
@@ -312,7 +308,7 @@ class Xml2Array
         if (is_array($values)) {
             // if only one node of its kind, assign it directly instead if array($value);
             foreach ($values as $key => $value) {
-                if (is_array($value) && count($value) === 1) {
+                if (is_array($value) && 1 === count($value)) {
                     $keyName = array_keys($value)[0];
 
                     if (is_numeric($keyName)) {
@@ -330,10 +326,10 @@ class Xml2Array
     }
 
     /**
-     * Parse DOMNode to get its attributes
+     * Parse DOMNode to get its attributes.
      *
-     * @param  DOMNode $node
-     * @param  mixed   $output
+     * @param DOMNode $node
+     * @param mixed   $output
      *
      * @return mixed
      */
@@ -375,10 +371,10 @@ class Xml2Array
     }
 
     /**
-     * Collect namespaces for special DOMNode
+     * Collect namespaces for special DOMNode.
      *
-     * @param  DOMNode $node
-     * @param  array   $output
+     * @param DOMNode $node
+     * @param array   $output
      *
      * @return array
      */
@@ -394,9 +390,9 @@ class Xml2Array
     }
 
     /**
-     * Get the namespace of the supplied node, and add it to the list of known namespaces for this document
+     * Get the namespace of the supplied node, and add it to the list of known namespaces for this document.
      *
-     * @param  DOMNode $node
+     * @param DOMNode $node
      *
      * @return mixed
      */

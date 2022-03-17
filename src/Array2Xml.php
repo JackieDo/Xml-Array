@@ -1,42 +1,37 @@
-<?php namespace Jackiedo\XmlArray;
+<?php
+
+namespace Jackiedo\XmlArray;
 
 use DOMDocument;
 use DOMElement;
 use DOMException;
 
 /**
- * Array2Xml: A class to convert array in PHP to well-formed XML.
- * Throws an exception if the tag name or attribute name has invalid chars.
+ * A class to convert array in PHP to well-formed XML.
  *
- * Usage:
- *       $xml = Array2Xml::convert($array)->toXml();
- *       $xml = Array2Xml::convert($array, ['rootElement' => 'root_node'])->toXml();
- *       $dom = Array2Xml::convert($array)->toDom();
+ * @see https://github.com/JackieDo/Xml-Array/blob/master/README.md Documentation.
  *
- * @package xml-array
  * @author Jackie Do <anhvudo@gmail.com>
- * @copyright 2018
- * @version $Id$
- * @access public
+ * @license MIT
  */
 class Array2Xml
 {
     /**
-     * The configuration of the conversion
+     * The configuration of the conversion.
      *
      * @var array
      */
     protected $config = [];
 
     /**
-     * The working XML document
+     * The working XML document.
      *
      * @var DOMDocument
      */
-    protected $xml = null;
+    protected $xml;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param array $config The configuration to use for this instance
      */
@@ -48,9 +43,9 @@ class Array2Xml
     }
 
     /**
-     * Set configuration for converter
+     * Set configuration for converter.
      *
-     * @param  array  $config The configuration to use for conversion
+     * @param array $config The configuration to use for conversion
      *
      * @return $this
      */
@@ -71,7 +66,7 @@ class Array2Xml
     }
 
     /**
-     * Return configuration of converter
+     * Return configuration of converter.
      *
      * @return array
      */
@@ -82,12 +77,12 @@ class Array2Xml
 
     /**
      * Convert an array to an XML document
-     * A static facade for ease of use and backwards compatibility
+     * A static facade for ease of use and backwards compatibility.
      *
-     * @param  array $array  The input array
-     * @param  array $config The configuration to use for the conversion
+     * @param array $array  The input array
+     * @param array $config The configuration to use for the conversion
      *
-     * @return DOMDocument   The XML representation of the input array
+     * @return $this
      */
     public static function convert(array $array = [], array $config = [])
     {
@@ -97,9 +92,11 @@ class Array2Xml
     }
 
     /**
-     * Convert an array to an XML document
+     * Convert an array to an XML document.
      *
-     * @param  array $array The input array
+     * @param array $array The input array
+     *
+     * @throws DOMException
      *
      * @return $this
      */
@@ -107,7 +104,7 @@ class Array2Xml
     {
         if (isset($this->config['rootElement'])) {
             $rootElement = $this->config['rootElement'];
-        } elseif (count($array) == 1) {
+        } elseif (1 == count($array)) {
             $rootElement = array_keys($array)[0];
             $array       = $array[$rootElement];
         } else {
@@ -122,7 +119,7 @@ class Array2Xml
     /**
      * Return as XML.
      *
-     * @param  $prettyOutput  Format output for DOMDocument
+     * @param $prettyOutput Format output for DOMDocument
      *
      * @return string
      */
@@ -144,14 +141,14 @@ class Array2Xml
     }
 
     /**
-     * Build XML node
+     * Build XML node.
      *
-     * @param  string $nodeName The name of the node that the data will be stored under
-     * @param  mixed  $data     The value to be build
+     * @param string $nodeName The name of the node that the data will be stored under
+     * @param mixed  $data     The value to be build
      *
      * @throws DOMException
      *
-     * @return DOMElement       The XML representation of the input data
+     * @return DOMElement The XML representation of the input data
      */
     protected function buildNode($nodeName, $data)
     {
@@ -162,7 +159,7 @@ class Array2Xml
         $node = $this->xml->createElement($nodeName);
 
         if (is_array($data)) {
-            $this->parseArray($node, $nodeName, $data);
+            $this->parseArray($node, $data);
         } else {
             $node->appendChild($this->xml->createTextNode($this->normalizeValues($data)));
         }
@@ -171,20 +168,19 @@ class Array2Xml
     }
 
     /**
-     * Parse array to build node
+     * Parse array to build node.
      *
-     * @param  DOMElement $node
-     * @param  string     $nodeName
-     * @param  array      $array
+     * @param DOMElement $node
+     * @param array      $array
      *
      * @throws DOMException
      *
      * @return void
      */
-    protected function parseArray(DOMElement $node, $nodeName, array $array)
+    protected function parseArray(DOMElement $node, array $array)
     {
         // get the attributes first.;
-        $array = $this->parseAttributes($node, $nodeName, $array);
+        $array = $this->parseAttributes($node, $array);
 
         // get value stored in @value
         $array = $this->parseValue($node, $array);
@@ -215,17 +211,16 @@ class Array2Xml
     }
 
     /**
-     * Build attributes of node
+     * Build attributes of node.
      *
-     * @param  DOMElement $node
-     * @param  string     $nodeName
-     * @param  array      $array
+     * @param DOMElement $node
+     * @param array      $array
      *
      * @throws DOMException
      *
      * @return array
      */
-    protected function parseAttributes(DOMElement $node, $nodeName, array $array)
+    protected function parseAttributes(DOMElement $node, array $array)
     {
         $attributesKey = $this->config['attributesKey'];
 
@@ -245,12 +240,12 @@ class Array2Xml
     }
 
     /**
-     * Build value of node
+     * Build value of node.
      *
-     * @param  DOMElement $node
-     * @param  array      $array
+     * @param DOMElement $node
+     * @param array      $array
      *
-     * @return DOMElement|array
+     * @return array
      */
     protected function parseValue(DOMElement $node, array $array)
     {
@@ -266,12 +261,12 @@ class Array2Xml
     }
 
     /**
-     * Build CDATA of node
+     * Build CDATA of node.
      *
-     * @param  DOMElement $node
-     * @param  array      $array
+     * @param DOMElement $node
+     * @param array      $array
      *
-     * @return DOMElement|array
+     * @return array
      */
     protected function parseCdata(DOMElement $node, array $array)
     {
@@ -287,35 +282,35 @@ class Array2Xml
     }
 
     /**
-     * Get string representation of values
+     * Get string representation of values.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return string
      */
     protected function normalizeValues($value)
     {
-        $value = $value === true ? 'true' : $value;
-        $value = $value === false ? 'false' : $value;
-        $value = $value === null ? '' : $value;
+        $value = true  === $value ? 'true' : $value;
+        $value = false === $value ? 'false' : $value;
+        $value = null  === $value ? '' : $value;
 
         return (string) $value;
     }
 
     /**
-     * Check if the tag name or attribute name contains illegal characters
+     * Check if the tag name or attribute name contains illegal characters.
+     *
      * @see: http://www.w3.org/TR/xml/#sec-common-syn
      *
      * @param  string
+     * @param mixed $tag
      *
-     * @return boolean
+     * @return bool
      */
     protected function isValidTagName($tag)
     {
         $pattern = '/^[a-zA-Z_][\w\:\-\.]*$/';
 
-        return preg_match($pattern, $tag, $matches) && $matches[0] == $tag && substr($tag, -1, 1) != ':';
+        return preg_match($pattern, $tag, $matches) && $matches[0] == $tag && ':' != substr($tag, -1, 1);
     }
-
 }
-
