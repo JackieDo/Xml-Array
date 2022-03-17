@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "phpunit/phpunit" --no-interaction --no-update
+          composer require "phpunit/phpunit:~5.0" --no-interaction --no-update
           composer update --prefer-source --no-interaction
       - name: Execute tests
         run: vendor/bin/phpunit --testdox
