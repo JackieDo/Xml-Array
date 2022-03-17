@@ -64,8 +64,8 @@ $rules = [
         'elements' => [
             'property',
             'method',
-        ]
-    ]
+        ],
+    ],
 ];
 
 $config = new Config;
