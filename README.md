@@ -1,4 +1,6 @@
 # Xml-Array
+
+[![Run tests](https://github.com/JackieDo/Xml-Array/actions/workflows/run-tests.yml/badge.svg)](https://github.com/JackieDo/Xml-Array/actions/workflows/run-tests.yml)
 [![Build Status](https://api.travis-ci.org/JackieDo/Xml-Array.svg?branch=master)](https://travis-ci.org/JackieDo/Xml-Array)
 [![Total Downloads](https://poser.pugx.org/jackiedo/xml-array/downloads)](https://packagist.org/packages/jackiedo/xml-array)
 [![Latest Stable Version](https://poser.pugx.org/jackiedo/xml-array/v/stable)](https://packagist.org/packages/jackiedo/xml-array)
