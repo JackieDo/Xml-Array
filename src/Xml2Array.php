@@ -21,12 +21,12 @@ class Xml2Array
     /**
      * The name of the XML attribute that indicates a namespace definition.
      */
-    public const ATTRIBUTE_NAMESPACE = 'xmlns';
+    const ATTRIBUTE_NAMESPACE = 'xmlns';
 
     /**
      * The string that separates the namespace attribute from the prefix for the namespace.
      */
-    public const ATTRIBUTE_NAMESPACE_SEPARATOR = ':';
+    const ATTRIBUTE_NAMESPACE_SEPARATOR = ':';
 
     /**
      * The configuration of the current instance.
