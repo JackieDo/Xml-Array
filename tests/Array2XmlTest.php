@@ -1,6 +1,7 @@
 <?php
 
 use Jackiedo\XmlArray\Array2Xml;
+use Jackiedo\XmlArray\Tests\Traits\AdaptivePhpUnit;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -9,6 +10,8 @@ use PHPUnit\Framework\TestCase;
  */
 class Array2XmlTest extends TestCase
 {
+    use AdaptivePhpUnit;
+
     /**
      * Input for test.
      *
@@ -70,10 +73,12 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_there_are_more_than_one_root_node()
     {
-        $this->expectException(DOMException::class);
-        $this->expectExceptionMessage('XML documents are allowed only one root element. Wrap your elements in a key or set the `rootElement` parameter in the configuration.');
+        $this->expectExceptionAndMessage(
+            DOMException::class,
+            'XML documents are allowed only one root element. Wrap your elements in a key or set the `rootElement` parameter in the configuration.'
+        );
 
-        $process = Array2Xml::convert([
+        Array2Xml::convert([
             'root'         => 'content',
             'another_root' => 'Another content',
         ]);
@@ -87,10 +92,12 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_node_name_is_invalid()
     {
-        $this->expectException(DOMException::class);
-        $this->expectExceptionMessage('Invalid character in the tag name being generated: 0');
+        $this->expectExceptionAndMessage(
+            DOMException::class,
+            'Invalid character in the tag name being generated: 0'
+        );
 
-        $process = Array2Xml::convert(['content']);
+        Array2Xml::convert(['content']);
     }
 
     /**
@@ -101,10 +108,12 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_attaribute_name_is_invalid()
     {
-        $this->expectException(DOMException::class);
-        $this->expectExceptionMessage('Invalid character in the attribute name being generated: invalid attribute');
+        $this->expectExceptionAndMessage(
+            DOMException::class,
+            'Invalid character in the attribute name being generated: invalid attribute'
+        );
 
-        $process = Array2Xml::convert([
+        Array2Xml::convert([
             'root' => [
                 'sub' => [
                     '@attributes' => [
