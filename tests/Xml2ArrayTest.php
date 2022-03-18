@@ -1,7 +1,6 @@
 <?php
 
 use Jackiedo\XmlArray\Xml2Array;
-use Jackiedo\Xml2Array\Tests\Traits\AdaptivePhpUnit;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  */
 class Xml2ArrayTest extends TestCase
 {
-    use AdaptivePhpUnit;
-
     /**
      * Store expected result for full test.
      *
@@ -348,10 +345,8 @@ class Xml2ArrayTest extends TestCase
      */
     public function throw_dom_exception_when_input_xml_string_not_well_formed()
     {
-        $this->expectExceptionAndMessage(
-            DOMException::class,
-            'Error parsing XML string, input is not a well-formed XML string.'
-        );
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Error parsing XML string, input is not a well-formed XML string.');
 
         Xml2Array::convert('123');
     }
@@ -364,10 +359,8 @@ class Xml2ArrayTest extends TestCase
      */
     public function throw_dom_exception_when_invalid_input()
     {
-        $this->expectExceptionAndMessage(
-            DOMException::class,
-            'The input XML must be one of types DOMDocument, SimpleXMLElement or well-formed XML string.'
-        );
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('The input XML must be one of types DOMDocument, SimpleXMLElement or well-formed XML string.');
 
         Xml2Array::convert([]);
     }

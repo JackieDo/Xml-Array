@@ -1,7 +1,6 @@
 <?php
 
 use Jackiedo\XmlArray\Array2Xml;
-use Jackiedo\XmlArray\Tests\Traits\AdaptivePhpUnit;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  */
 class Array2XmlTest extends TestCase
 {
-    use AdaptivePhpUnit;
-
     /**
      * Input for test.
      *
@@ -73,12 +70,10 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_there_are_more_than_one_root_node()
     {
-        $this->expectExceptionAndMessage(
-            DOMException::class,
-            'XML documents are allowed only one root element. Wrap your elements in a key or set the `rootElement` parameter in the configuration.'
-        );
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('XML documents are allowed only one root element. Wrap your elements in a key or set the `rootElement` parameter in the configuration.');
 
-        Array2Xml::convert([
+        $process = Array2Xml::convert([
             'root'         => 'content',
             'another_root' => 'Another content',
         ]);
@@ -92,12 +87,10 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_node_name_is_invalid()
     {
-        $this->expectExceptionAndMessage(
-            DOMException::class,
-            'Invalid character in the tag name being generated: 0'
-        );
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Invalid character in the tag name being generated: 0');
 
-        Array2Xml::convert(['content']);
+        $process = Array2Xml::convert(['content']);
     }
 
     /**
@@ -108,12 +101,10 @@ class Array2XmlTest extends TestCase
      */
     public function throw_dom_exception_when_attaribute_name_is_invalid()
     {
-        $this->expectExceptionAndMessage(
-            DOMException::class,
-            'Invalid character in the attribute name being generated: invalid attribute'
-        );
+        $this->expectException(DOMException::class);
+        $this->expectExceptionMessage('Invalid character in the attribute name being generated: invalid attribute');
 
-        Array2Xml::convert([
+        $process = Array2Xml::convert([
             'root' => [
                 'sub' => [
                     '@attributes' => [
