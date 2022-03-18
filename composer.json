@@ -32,7 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Jackiedo\\XmlArray\\": "src/"
+            "Jackiedo\\XmlArray\\": "src/",
+            "Jackiedo\\XmlArrayTests\\": "tests/"
         }
     },
     "minimum-stability": "stable"
