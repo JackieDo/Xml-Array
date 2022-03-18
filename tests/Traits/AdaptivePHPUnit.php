@@ -3,7 +3,7 @@
 namespace Jackiedo\XmlArrayTests\Traits;
 
 /**
- * A trait for adapting to PHPUnit versions before and after 5.2
+ * A trait for adapting to PHPUnit versions before and after 5.2.
  */
 trait AdaptivePHPUnit
 {
