@@ -1,7 +1,7 @@
 <?php
 
-use Jackiedo\XmlArray\Xml2Array;
 use Jackiedo\XmlArray\Tests\Traits\AdaptivePhpUnit;
+use Jackiedo\XmlArray\Xml2Array;
 use PHPUnit\Framework\TestCase;
 
 /**
