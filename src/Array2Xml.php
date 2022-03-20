@@ -5,6 +5,7 @@ namespace Jackiedo\XmlArray;
 use DOMDocument;
 use DOMElement;
 use DOMException;
+use Exception;
 
 /**
  * A class to convert array in PHP to well-formed XML.
@@ -40,12 +41,22 @@ class Array2Xml
         $this->setConfig($config);
 
         $this->xml = new DOMDocument($this->config['version'], $this->config['encoding']);
+
+        if (array_key_exists('standalone', $this->config) && is_bool($xmlStandalone = $this->config['standalone'])) {
+            if (property_exists($this->xml, 'xmlStandalone')) {
+                $this->xml->xmlStandalone = $xmlStandalone;
+            } else {
+                $this->xml->standalone = $xmlStandalone;
+            }
+        }
     }
 
     /**
      * Set configuration for converter.
      *
      * @param array $config The configuration to use for conversion
+     *
+     * @throws Exception
      *
      * @return $this
      */
@@ -54,11 +65,21 @@ class Array2Xml
         $defaultConfig = [
             'version'       => '1.0',
             'encoding'      => 'UTF-8',
+            'standalone'    => null,
+            'rootElement'   => null,
             'attributesKey' => '@attributes',
             'cdataKey'      => '@cdata',
             'valueKey'      => '@value',
-            'rootElement'   => null,
+            'keyFixer'      => true,
         ];
+
+        if (array_key_exists('keyFixer', $config)) {
+            $keyFixer = $config['keyFixer'];
+
+            if (!is_bool($keyFixer) && !is_string($keyFixer) && !is_numeric($keyFixer) && !is_callable($keyFixer)) {
+                throw new Exception('Invalid the `keyFixer` setting. Only accept `bool|string|numeric|callable` type.');
+            }
+        }
 
         $this->config = array_merge($defaultConfig, $config);
 
@@ -152,16 +173,14 @@ class Array2Xml
      */
     protected function buildNode($nodeName, $data)
     {
-        if (!$this->isValidTagName($nodeName)) {
-            throw new DOMException('Invalid character in the tag name being generated: ' . $nodeName);
-        }
+        $this->ensureValidTagName($nodeName, 'tag');
 
         $node = $this->xml->createElement($nodeName);
 
         if (is_array($data)) {
             $this->parseArray($node, $data);
         } else {
-            $node->appendChild($this->xml->createTextNode($this->normalizeValues($data)));
+            $node->appendChild($this->xml->createTextNode($this->normalizeValue($data)));
         }
 
         return $node;
@@ -190,13 +209,13 @@ class Array2Xml
 
         // recurse to build child nodes for this node
         foreach ($array as $key => $value) {
-            if (!$this->isValidTagName($key)) {
-                throw new DOMException('Invalid character in the tag name being generated: ' . $key);
-            }
+            $key = $this->normalizeKey($key);
 
-            if (is_array($value) && is_numeric(key($value))) {
+            $this->ensureValidTagName($key, 'tag');
+
+            if ($this->isSequentialArray($value)) {
                 // MORE THAN ONE NODE OF ITS KIND;
-                // if the new array is numeric index, means it is array of nodes of the same kind
+                // if the new array is sequential array, means it is array of nodes of the same kind
                 // it should follow the parent key name
                 foreach ($value as $v) {
                     $node->appendChild($this->buildNode($key, $v));
@@ -226,11 +245,11 @@ class Array2Xml
 
         if (array_key_exists($attributesKey, $array) && is_array($array[$attributesKey])) {
             foreach ($array[$attributesKey] as $key => $value) {
-                if (!$this->isValidTagName($key)) {
-                    throw new DOMException('Invalid character in the attribute name being generated: ' . $key);
-                }
+                $key = $this->normalizeKey($key);
 
-                $node->setAttribute($key, $this->normalizeValues($value));
+                $this->ensureValidTagName($key, 'attribute');
+
+                $node->setAttribute($key, $this->normalizeValue($value));
             }
 
             unset($array[$attributesKey]);
@@ -252,7 +271,7 @@ class Array2Xml
         $valueKey = $this->config['valueKey'];
 
         if (array_key_exists($valueKey, $array)) {
-            $node->appendChild($this->xml->createTextNode($this->normalizeValues($array[$valueKey])));
+            $node->appendChild($this->xml->createTextNode($this->normalizeValue($array[$valueKey])));
 
             unset($array[$valueKey]);
         }
@@ -273,12 +292,38 @@ class Array2Xml
         $cdataKey = $this->config['cdataKey'];
 
         if (array_key_exists($cdataKey, $array)) {
-            $node->appendChild($this->xml->createCDATASection($this->normalizeValues($array[$cdataKey])));
+            $node->appendChild($this->xml->createCDATASection($this->normalizeValue($array[$cdataKey])));
 
             unset($array[$cdataKey]);
         }
 
         return $array;
+    }
+
+    /**
+     * Normalize invalid characters in the key name.
+     *
+     * @param string $key The key name need to fix
+     *
+     * @return string
+     */
+    protected function normalizeKey($key)
+    {
+        $keyFixer = $this->config['keyFixer'];
+
+        if (is_bool($keyFixer)) {
+            if (!$keyFixer) {
+                return $key;
+            }
+
+            $keyFixer = '_';
+        }
+
+        if (is_string($keyFixer) || is_numeric($keyFixer)) {
+            return preg_replace(['/[^\w\:\-\.]/', '/^[^a-zA-Z_]/', '/\:+$/'], [$keyFixer, '_${0}', $keyFixer], $key);
+        }
+
+        return call_user_func_array($keyFixer, [$key]);
     }
 
     /**
@@ -288,7 +333,7 @@ class Array2Xml
      *
      * @return string
      */
-    protected function normalizeValues($value)
+    protected function normalizeValue($value)
     {
         $value = true  === $value ? 'true' : $value;
         $value = false === $value ? 'false' : $value;
@@ -298,19 +343,58 @@ class Array2Xml
     }
 
     /**
-     * Check if the tag name or attribute name contains illegal characters.
+     * Throw DOMException if a string is invalid for well-formed name.
+     *
+     * @param string $name
+     * @param string $type
+     *
+     * @return void
+     */
+    protected function ensureValidTagName($name, $type)
+    {
+        if (!$this->isValidName($name)) {
+            throw new DOMException('Invalid character in the ' . $type . ' name being generated. Failed at [' . $name . '].');
+        }
+    }
+
+    /**
+     * Checks if the key name contains valid characters to be the well-formed tag or attribute name.
+     *
+     * A valid key is one that conforms to the pattern /^[a-zA-Z_][\w\:\-\.]*$(?<!\:)/
      *
      * @see: http://www.w3.org/TR/xml/#sec-common-syn
      *
      * @param  string
-     * @param mixed $tag
+     * @param mixed $name
      *
      * @return bool
      */
-    protected function isValidTagName($tag)
+    protected function isValidName($name)
     {
-        $pattern = '/^[a-zA-Z_][\w\:\-\.]*$/';
+        $pattern = '/^([a-zA-Z_][\w\-\.]*\:)?[a-zA-Z_][\w\-\.]*$(?<!\:)/';
 
-        return preg_match($pattern, $tag, $matches) && $matches[0] == $tag && ':' != substr($tag, -1, 1);
+        return 1 === preg_match($pattern, $name, $matches);
+    }
+
+    /**
+     * Determine if the input is a sequential array.
+     *
+     * @param mixed $array
+     *
+     * @return bool
+     */
+    protected function isSequentialArray($array)
+    {
+        if (!is_array($array)) {
+            return false;
+        }
+
+        $totalCount = count($array);
+
+        if ($totalCount <= 0) {
+            return true;
+        }
+
+        return array_keys($array) === range(0, $totalCount - 1);
     }
 }

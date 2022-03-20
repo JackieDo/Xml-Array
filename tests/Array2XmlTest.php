@@ -94,10 +94,12 @@ class Array2XmlTest extends TestCase
     {
         $this->setExpectedException(
             'DOMException',
-            'Invalid character in the tag name being generated: 0'
+            'Invalid character in the tag name being generated. Failed at [0].'
         );
 
-        $process = Array2Xml::convert(['content']);
+        $process = Array2Xml::convert(['content'], [
+            'keyFixer' => false
+        ]);
     }
 
     /**
@@ -110,7 +112,7 @@ class Array2XmlTest extends TestCase
     {
         $this->setExpectedException(
             'DOMException',
-            'Invalid character in the attribute name being generated: invalid attribute'
+            'Invalid character in the attribute name being generated. Failed at [invalid attribute].'
         );
 
         $process = Array2Xml::convert([
@@ -121,6 +123,8 @@ class Array2XmlTest extends TestCase
                     ],
                 ],
             ],
+        ], [
+            'keyFixer' => false
         ]);
     }
 
