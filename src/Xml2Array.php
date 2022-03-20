@@ -139,12 +139,8 @@ class Xml2Array
                 $this->array[$rootNodeName][$this->config['attributesKey']] = [];
             }
 
-            foreach ($this->namespaces as $uri => $prefix) {
-                if ($prefix) {
-                    $prefix = self::ATTRIBUTE_NAMESPACE_SEPARATOR . $prefix;
-                }
-
-                $this->array[$rootNodeName][$this->config['attributesKey']][self::ATTRIBUTE_NAMESPACE . $prefix] = $uri;
+            foreach ($this->namespaces as $prefix => $uri) {
+                $this->array[$rootNodeName][$this->config['attributesKey']][$prefix] = $uri;
             }
         }
 
@@ -340,18 +336,10 @@ class Xml2Array
         }
 
         $attributes = [];
-        $namespaces = [];
 
         foreach ($node->attributes as $attributeName => $attributeNode) {
             $attributeName              = $attributeNode->nodeName;
             $attributes[$attributeName] = (string) $attributeNode->value;
-
-            if ($attributeNode->namespaceURI) {
-                $nsUri    = $attributeNode->namespaceURI;
-                $nsPrefix = $attributeNode->lookupPrefix($nsUri);
-
-                $namespaces = $this->collectNamespaces($attributeNode);
-            }
         }
 
         // if its a leaf node, store the value in @value instead of directly it.
@@ -363,7 +351,7 @@ class Xml2Array
             }
         }
 
-        foreach (array_merge($attributes, $namespaces) as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $output[$this->config['attributesKey']][$key] = $value;
         }
 
@@ -400,19 +388,15 @@ class Xml2Array
     {
         $namespaces = [];
 
-        if ($node->namespaceURI) {
-            $nsUri    = $node->namespaceURI;
-            $nsPrefix = $node->lookupPrefix($nsUri);
+        if ($nsUri = $node->namespaceURI) {
+            $nsPrefix   = $node->lookupPrefix($nsUri);
+            $fullPrefix = self::ATTRIBUTE_NAMESPACE . ($nsPrefix ? self::ATTRIBUTE_NAMESPACE_SEPARATOR . $nsPrefix : $nsPrefix);
 
-            if (!array_key_exists($nsUri, $this->namespaces)) {
-                $this->namespaces[$nsUri] = $nsPrefix;
+            if (!array_key_exists($fullPrefix, $this->namespaces)) {
+                $this->namespaces[$fullPrefix] = $nsUri;
 
                 if (!$this->config['namespacesOnRoot']) {
-                    if ($nsPrefix) {
-                        $nsPrefix = self::ATTRIBUTE_NAMESPACE_SEPARATOR . $nsPrefix;
-                    }
-
-                    $namespaces[self::ATTRIBUTE_NAMESPACE . $nsPrefix] = $nsUri;
+                    $namespaces[$fullPrefix] = $nsUri;
                 }
             }
         }
