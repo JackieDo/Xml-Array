@@ -98,7 +98,7 @@ class Array2XmlTest extends TestCase
         );
 
         $process = Array2Xml::convert(['content'], [
-            'keyFixer' => false
+            'keyFixer' => false,
         ]);
     }
 
@@ -124,7 +124,7 @@ class Array2XmlTest extends TestCase
                 ],
             ],
         ], [
-            'keyFixer' => false
+            'keyFixer' => false,
         ]);
     }
 
