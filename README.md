@@ -20,10 +20,8 @@ Look at one of the following sessions to learn more about this package.
 - [Overview](#overview)
   - [Installation](#installation)
   - [Basic usage](#basic-usage)
-    - [Convert XML to array](#convert-xml-to-array)
-    - [Convert XML to Json](#convert-xml-to-json)
-    - [Convert array to XML](#convert-array-to-xml)
-    - [Convert array to DOM](#convert-array-to-dom)
+    - [Convert from XML](#convert-from-xml)
+    - [Convert from array](#convert-from-array)
   - [Advanced usage](#advanced-usage)
     - [Set configuration](#set-configuration)
       - [Method 1](#method-1)
@@ -33,6 +31,14 @@ Look at one of the following sessions to learn more about this package.
     - [Default configuration](#default-configuration)
       - [For Xml2Array](#for-xml2array)
       - [For Array2Xml](#for-array2xml)
+    - [Effect of configuration settings](#effect-of-configuration-settings)
+      - [version](#version)
+      - [encoding](#encoding)
+      - [standalone](#standalone)
+      - [attributesKey, cdataKey, valueKey](#attributeskey-cdatakey-valuekey)
+      - [namespacesOnRoot](#namespacesonroot)
+      - [rootElement](#rootelement)
+      - [keyFixer](#keyfixer)
 - [License](#license)
 
 ## Installation
@@ -44,17 +50,25 @@ $ composer require jackiedo/xml-array
 
 ## Basic usage
 
-### Convert XML to array
+### Convert from XML
 
-**Syntax**:
+Web have two following methods:
 
+**Convert to array**:
+
+```php
+Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toArray();
 ```
-array Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toArray();
+
+**Convert to Json**:
+
+```php
+Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toJson(int $flag = 0);
 ```
 
 > **Note:** The input XML can be one of types DOMDocument object, SimpleXMLElement object or well-formed XML string.
 
-**Example 1** - _(Convert from XML string)_:
+**Example 1**: - _(Convert from XML string)_
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -143,7 +157,7 @@ $array = [
 ]
 ```
 
-**Example 2** - _(Convert form XML object, such as SimpleXMLElement)_:
+**Example 2**: - _(Convert form XML object, such as SimpleXMLElement)_
 
 ```php
 use Jackiedo\XmlArray\Xml2Array;
@@ -337,26 +351,26 @@ $array = [
 ];
 ```
 
-### Convert XML to Json
-
-**Syntax**:
-
-```
-string Xml2Array::convert(DOMDocument|SimpleXMLElement|string $inputXML)->toJson([int $options = 0]);
-```
-
-**Example 3**:
+**Example 3**: - _(Convert to Json)_
 
 ```php
 $jsonString = Xml2Array::convert($xmlString)->toJson(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 ```
 
-### Convert array to XML
+### Convert from array
 
-**Syntax**:
+We also have two following methods:
 
+**Convert to XML string**:
+
+```php
+Array2Xml::convert(array $array)->toXml(bool $prettyOutput = false);
 ```
-string Array2Xml::convert(array $array)->toXml([bool $prettyOutput = false]);
+
+**Convert to DOMDocument object**:
+
+```php
+Array2Xml::convert(array $array)->toDom();
 ```
 
 **Example 4**:
@@ -369,14 +383,6 @@ use Jackiedo\XmlArray\Array2Xml;
 $xmlString = Array2Xml::convert($array)->toXml(true);
 ```
 
-### Convert array to DOM
-
-**Syntax**:
-
-```
-DOMDocument Array2Xml::convert(array $array)->toDom();
-```
-
 **Example 5**:
 
 ```php
@@ -386,7 +392,7 @@ $domObject = Array2Xml::convert($array)->toDom();
 ## Advanced usage
 
 ### Set configuration
-You can set configuration for conversion process with one of following methods:
+If we want to change the settings for the conversion process, we can do it in the following ways:
 
 #### Method 1
 
@@ -394,7 +400,8 @@ You can set configuration for conversion process with one of following methods:
 ...
 $config = [
     'valueKey' => '@text',
-    'cdataKey' => '@cdata-section'
+    'cdataKey' => '@cdata-section',
+    ...
 ];
 
 $array = Xml2Array::convert($inputXml, $config)->toArray();
@@ -421,7 +428,7 @@ $array     = $converter->setConfig($config)->convertFrom($inputXml)->toArray();
 ```
 
 ### Get configuration
-If you implemented the conversion process using methods 2 and 3, you can get configuration of the conversion with method:
+If we implemented the conversion process using methods 2 and 3, we can get configuration of the conversion with method:
 
 ```php
 $config = $converter->getConfig();
@@ -435,10 +442,11 @@ $config = $converter->getConfig();
 $defaultConfig = [
     'version'          => '1.0',         // Version of XML document
     'encoding'         => 'UTF-8',       // Encoding of XML document
+    'standalone'       => null,          // Standalone directive for XML document
     'attributesKey'    => '@attributes', // The key name use for storing attributes of node
     'cdataKey'         => '@cdata',      // The key name use for storing value of Cdata Section in node
     'valueKey'         => '@value',      // The key name use for storing text content of node
-    'namespacesOnRoot' => true           // Collapse all the namespaces on the root node, otherwise it will put in the nodes for which the namespace first appeared.
+    'namespacesOnRoot' => true           // Collapse all the namespaces at the root node, otherwise it will put in the nodes for which the namespace first appeared.
 ];
 ```
 
@@ -448,11 +456,160 @@ $defaultConfig = [
 $defaultConfig = [
     'version'       => '1.0',         // Version of XML document
     'encoding'      => 'UTF-8',       // Encoding of XML document
+    'standalone'    => null,          // Standalone directive for XML document
     'attributesKey' => '@attributes', // The key name use for storing attributes of node
     'cdataKey'      => '@cdata',      // The key name use for storing value of Cdata Section in node
     'valueKey'      => '@value',      // The key name use for storing text content of node
     'rootElement'   => null,          // The name of root node will be create automatically in process of conversion
+    'keyFixer'      => true,          // The automatically key normalization will be used during conversion. It can be bool|string|numeric|callable
 ];
+```
+
+### Effect of configuration settings
+
+#### version
+
+| Use in               | Data type |
+| -------------------- | --------- |
+| Xml2Array, Array2Xml | string    |
+
+**Effect**: This setting allows specifying the XML version to be generated (in Array2Xml), or reconstructed from the XML string (in Xml2Array)
+
+#### encoding
+
+| Use in               | Data type |
+| -------------------- | --------- |
+| Xml2Array, Array2Xml | string    |
+
+**Effect**: This setting is to indicate the encoding type of the XML to be generated (in Array2Xml), or reconstructed from the XML string (in Xml2Array)
+
+#### standalone
+
+| Use in               | Data type |
+| -------------------- | --------- |
+| Xml2Array, Array2Xml | null|bool |
+
+**Effect**: This setting is to allow the `standalone` directive to appear in the XML or not. If it is set to `null`, this directive will not appear.
+
+**Example**:
+
+```php
+$xml = Array2Xml::convert($array, [
+    'standalone' => true
+])->toXml(true);
+```
+
+Content in $xml will be
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+...
+```
+
+#### attributesKey, cdataKey, valueKey
+
+| Use in               | Data type |
+| -------------------- | --------- |
+| Xml2Array, Array2Xml | string    |
+
+**Effect**: This setting allows the use of special keywords to contain the values ​​of properties, CDATA section... during the conversion process.
+
+**Example**: Please review the examples above for more detailed understanding.
+
+#### namespacesOnRoot
+
+| Use in    | Data type |
+| --------- | --------- |
+| Xml2Array | bool      |
+
+**Effect**: This setting allows to collect all the parsed XML namespaces and place them in the root node. If it is set to `false`, the namespaces will be located at the nodes where it is declared.
+
+**Example**: We use the `Example 1` above again, but this time the configuration is different:
+
+```php
+$array = Xml2Array::convert($xmlString, [
+    'namespacesOnRoot' => false
+])->toArray();
+```
+
+After running this piece of code `$array` will contain:
+
+```php
+$array = [
+    "root_node" => [
+        "tag"           => "Example tag",
+        "attribute_tag" => [
+            "@value"      => "Another tag with attributes",
+            "@attributes" => [
+                "description" => "This is a tag with attribute"
+            ]
+        ],
+        ...
+        "example:with_namespace" => [
+            "@attributes" => [
+                "xmlns:example" => "http://example.com"
+            ]
+            "example:sub" => "Content"
+        ],
+    ]
+]
+```
+
+You see, the `xlmns:example` namespace is put at the `example:with_namespace` key, not at `root_node` as it was originally.
+
+#### rootElement
+
+| Use in    | Data type |
+| --------- | --------- |
+| Array2Xml | string    |
+
+**Effect**: According to the Well-formed XML standard, the XML content is only allowed to have a single Root node. This setting allows to wrap all the elements of the original array into a single root node, instead of having to manually edit your array.
+
+#### keyFixer
+
+| Use in    | Data type                    |
+| --------- | ---------------------------- |
+| Array2Xml | bool|string|numeric|callable |
+
+**Effect**:
+
+According to the Well-formed XML standard, the tag names and attributes must satisfy a number of requirements, in which naming is specified as follows:
+
+- Only allowed to start with aphabet characters and underscore.
+- Only accept the `[a-zA-Z]`, `-`, `_`, `.`, `:` characters. In which, the `:` is used to indicate the namespace prefix.
+- Do not allow to end with `:`
+
+During conversion, array key names that violate these rules are automatically normalized. If you do not agree to this normalization, set this setting to `false`.
+
+By default, this normalization replaces invalid characters with underscores (`_`). You can change to another character as you like.
+
+**Example**:
+
+```php
+// Do not use the key normalization
+$xml = Array2Xml::convert($array, [
+    'keyFixer' => false
+])->toXml();
+
+// Use the key normalization with default character (_)
+$xml = Array2Xml::convert($array, [
+    'keyFixer' => true
+])->toXml();
+
+// Replace with '---'
+$xml = Array2Xml::convert($array, [
+    'keyFixer' => '---'
+])->toXml();
+
+// Use a callable for fixing
+$xml = Array2Xml::convert($array, [
+    'keyFixer' => function ($key) {
+        $key = str_replace('/', '_', $key);
+        $key = str_replace('\\' , '.', $key);
+
+        return $key;
+    }
+])->toXml();
 ```
 
 # License
