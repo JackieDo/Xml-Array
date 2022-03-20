@@ -78,6 +78,7 @@ class Xml2Array
         $defaultConfig = [
             'version'          => '1.0',
             'encoding'         => 'UTF-8',
+            'standalone'       => null,
             'attributesKey'    => '@attributes',
             'cdataKey'         => '@cdata',
             'valueKey'         => '@value',
@@ -176,11 +177,17 @@ class Xml2Array
      *
      * @throws DOMException
      *
-     * @return void
+     * @return $this
      */
     protected function loadXml($inputXml)
     {
-        $this->xml = new DOMDocument($this->config['version'], $this->config['encoding']);
+        if ($inputXml instanceof DOMDocument) {
+            $this->xml = $inputXml;
+
+            return $this;
+        }
+
+        $this->xml = $this->initDOMDocument();
 
         if (is_string($inputXml)) {
             $parse = @$this->xml->loadXML($inputXml);
@@ -188,13 +195,37 @@ class Xml2Array
             if (false === $parse) {
                 throw new DOMException('Error parsing XML string, input is not a well-formed XML string.');
             }
-        } elseif ($inputXml instanceof SimpleXMLElement) {
-            $this->xml->loadXML($inputXml->asXML());
-        } elseif ($inputXml instanceof DOMDocument) {
-            $this->xml = $inputXml;
-        } else {
-            throw new DOMException('The input XML must be one of types DOMDocument, SimpleXMLElement or well-formed XML string.');
+
+            return $this;
         }
+
+        if ($inputXml instanceof SimpleXMLElement) {
+            $this->xml->loadXML($inputXml->asXML());
+
+            return $this;
+        }
+
+        throw new DOMException('The input XML must be one of types DOMDocument, SimpleXMLElement or well-formed XML string.');
+    }
+
+    /**
+     * Generate new DOMDOcument.
+     *
+     * @return DOMDocument
+     */
+    protected function initDOMDocument()
+    {
+        $doc = new DOMDocument($this->config['version'], $this->config['encoding']);
+
+        if (array_key_exists('standalone', $this->config) && is_bool($xmlStandalone = $this->config['standalone'])) {
+            if (property_exists($doc, 'xmlStandalone')) {
+                $doc->xmlStandalone = $xmlStandalone;
+            } else {
+                $doc->standalone = $xmlStandalone;
+            }
+        }
+
+        return $doc;
     }
 
     /**
