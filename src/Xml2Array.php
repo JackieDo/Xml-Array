@@ -107,7 +107,7 @@ class Xml2Array
      * @param DOMDocument|SimpleXMLElement|string $xml    The XML to convert to an array
      * @param array                               $config The configuration to use for the conversion
      *
-     * @return array An array representation of the input XML
+     * @return static A Xml2Array instance
      */
     public static function convert($xml, array $config = [])
     {
@@ -121,7 +121,7 @@ class Xml2Array
      *
      * @param DOMDocument|SimpleXMLElement|string $inputXml The XML to convert to an array
      *
-     * @return array An array representation of the input XML
+     * @return static A Xml2Array instance
      */
     public function convertFrom($inputXml)
     {
