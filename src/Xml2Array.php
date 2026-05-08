@@ -269,7 +269,9 @@ class Xml2Array
      */
     protected function parseChildNodes(DOMNode $node, $output)
     {
-        foreach ($node->childNodes as $child) {
+        $childNodes = $node->childNodes;
+
+        foreach ($childNodes as $child) {
             if (XML_CDATA_SECTION_NODE === $child->nodeType) {
                 if (!is_array($output)) {
                     if (!empty($output)) {
@@ -285,7 +287,7 @@ class Xml2Array
 
                 if (XML_TEXT_NODE == $child->nodeType) {
                     if ('' != $value) {
-                        if (!empty($output)) {
+                        if ($childNodes->length > 1) {
                             $output[$this->config['valueKey']] = $value;
                         } else {
                             $output = $value;
